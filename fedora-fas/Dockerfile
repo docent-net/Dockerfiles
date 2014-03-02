@@ -1,4 +1,5 @@
-# Based on the Fedora image
+# FAS installation process based on https://github.com/docent-net/fas/blob/develop/INSTALL
+# Docker image based on the Fedora image
 FROM fedora
 
 MAINTAINER "Maciej Lasyk" <maciek@lasyk.info>
@@ -28,4 +29,12 @@ RUN echo "host    all             all             0.0.0.0/0               md5" >
 RUN /postgres_user.sh
 
 # now let's install FAS:
-RUN yum -y install git-core postgresql-plpython postgresql-server postgresql-python python-TurboMail TurboGears pygpgme python-sqlalchemy python-genshi python-psycopg2 pytz python-babel babel python-GeoIP python-openid python-fedora-turbogears python-migrate python-memcached python-tgcaptcha2 pyOpenSSL gettext python-imaging python-pwquality tulrich-tuffy-fonts
+RUN yum -y install git-core postgresql-plpython postgresql-server postgresql-python python-TurboMail TurboGears pygpgme python-sqlalchemy python-genshi python-psycopg4 pytz python-babel babel python-GeoIP python-openid python-fedora-turbogears python-migrate python-memcached python-tgcaptcha2 pyOpenSSL gettext python-imaging python-pwquality tulrich-tuffy-fonts
+
+RUN mkdir /srv/fas
+WORKDIR /srv/fas
+RUN git clone https://github.com/fedora-infra/fas.git
+RUN git checkout -b develop
+
+RUN python setup.py egg_info && python setup.py build
+
