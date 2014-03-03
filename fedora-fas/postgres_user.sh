@@ -11,6 +11,7 @@ ps aux
 
 su --login - postgres --command "psql -c \"CREATE USER dockeruser with CREATEROLE superuser PASSWORD 'password';\""
 su --login - postgres --command "psql -c \"CREATE DATABASE dockerdb;\""
+su --login - postgres --command "psql -c \"CREATE USER fedora with PASSWORD 'fedorafas';\""
 su --login - postgres --command "psql -c \"\du;\""
 }
 
