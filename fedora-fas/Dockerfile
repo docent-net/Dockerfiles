@@ -6,6 +6,7 @@ MAINTAINER "Maciej Lasyk" <maciek@lasyk.info>
 
 # install main packages:
 RUN yum -y update
+RUN yum -y install make gcc
 
 # firstly let's install postgres - following scollier's Dockerfile from https://git.fedorahosted.org/cgit/dockerfiles.git/tree/postgres
 RUN yum -y install postgresql-server postgresql postgresql-contrib supervisor
@@ -22,7 +23,7 @@ RUN /usr/bin/postgresql-setup initdb
 
 ADD ./postgresql.conf /var/lib/pgsql/data/postgresql.conf
 
-RUN chown -v postgres.postgres /var/lib/pgsql/data/postgresql.conf
+RUN chown -v postgres:postgres /var/lib/pgsql/data/postgresql.conf
 
 RUN echo "host    all             all             0.0.0.0/0               md5" >> /var/lib/pgsql/data/pg_hba.conf
 
@@ -33,17 +34,19 @@ RUN yum -y install git-core postgresql-plpython postgresql-server postgresql-pyt
 
 RUN useradd fedora-dev
 
-RUN mkdir /srv/fas
-WORKDIR /srv/fas
+RUN mkdir /srv -p
+WORKDIR /srv
 RUN git clone https://github.com/fedora-infra/fas.git
-RUN git checkout -b develop
 
+WORKDIR /srv/fas
 RUN python setup.py egg_info && python setup.py build
 
 RUN chown fedora-dev:fedora-dev /srv/fas -R
 
 USER postgres
-RUN createlang plpythonu template1
+RUN /start_postgres.sh & &>/dev/null
+#RUN /usr/bin/postgres -D /var/lib/pgsql/data -p 5432 & &>/dev/null
+#RUN createlang plpythonu template1
 
 USER fedora-dev
 RUN cp fas2.sql /tmp
@@ -54,3 +57,5 @@ RUN psql < /tmp/fas2.sql
 USER fedora-dev
 RUN rm -f /tmp/fas2.sql
 RUN cp fas.cfg.sample fas.cfg
+
+#RUN mv fas.cfg.sample fas.cfg
