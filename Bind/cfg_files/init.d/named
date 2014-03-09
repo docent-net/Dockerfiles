@@ -163,7 +163,7 @@ start()
   # check if configuration is correct
   if [ -x /usr/sbin/named-checkconf ] && [ -x /usr/sbin/named-checkzone ] && /usr/sbin/named-checkconf $ckcf_options ${named_conf} >/dev/null 2>&1; then
 
-    daemon --pidfile "$ROOTDIR/$PIDFILE" /usr/sbin/"$named" -u named ${OPTIONS};
+    daemon --pidfile "$ROOTDIR/$PIDFILE" /usr/sbin/"$named" -u named -f ${OPTIONS};
     RETVAL=$?
     if [ $RETVAL -eq 0 ]; then
       rm -f /var/run/{named,named-sdb}.pid;
